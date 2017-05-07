@@ -24,5 +24,8 @@
     <DotNetCliToolReference Include="Microsoft.Extensions.SecretManager.Tools" Version="1.0.0" />
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="1.0.0" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\EternalSolutions.Samples.B2C.Common\EternalSolutions.Samples.B2C.Common.csproj" />
+  </ItemGroup>
 
 </Project>
