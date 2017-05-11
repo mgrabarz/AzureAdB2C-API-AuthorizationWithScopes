@@ -1,48 +1,63 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+using EternalSolutions.Samples.B2C.Api.NotesService.Notes;
+using EternalSolutions.Samples.B2C.Common.Contracts;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace EternalSolutions.Samples.B2C.Api.NotesService.Controllers
 {
     [Route("api/[controller]")]
     public class NotesController : Controller
     {
+        private readonly NotesContext _dbContext;
+
+        public NotesController(NotesContext dbContext)
+        {
+            _dbContext = dbContext;
+        }
+
         // GET: api/values
         [HttpGet]
-        public IEnumerable<string> Get()
+        public async Task<IActionResult> All()
         {
-            return new string[] { "Note1", "Note2" };
+            var notes = await _dbContext.Notes.ToListAsync();
+            return Ok(notes);
         }
 
         // GET api/values/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public async Task<IActionResult> Get(int id)
         {
-            return "Note" + id;
+            var note = await _dbContext.Notes.FindAsync(id);
+            if (note != null)
+                return Ok(note);
+            else
+                return NotFound();
         }
 
         // POST api/values
         [HttpPost]
-        public void Post([FromBody]string value)
+        public async Task<IActionResult> Post([FromBody]Note note)
         {
-            Ok();
-        }
+            await _dbContext.Notes.AddAsync(note);
+            await _dbContext.SaveChangesAsync();
 
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
-        {
-            Ok();
+            return Ok(note.Id);
         }
 
         // DELETE api/values/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            StatusCode(418);
+            var note = await _dbContext.Notes.FindAsync(id);
+            if (note == null)
+                return NotFound();
+
+            _dbContext.Notes.Remove(note);
+            await _dbContext.SaveChangesAsync();
+            return Ok();
         }
     }
 }

@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using EternalSolutions.Samples.B2C.Api.NotesService.Notes;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -30,6 +32,10 @@ namespace EternalSolutions.Samples.B2C.Api.NotesService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            //Add database context (InMemory)
+            services.AddDbContext<NotesContext>(options =>
+                options.UseInMemoryDatabase());
+
             // Add framework services.
             services.AddMvc();
         }

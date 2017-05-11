@@ -1,93 +1,54 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using EternalSolutions.Samples.B2C.Common.Contracts;
+using Newtonsoft.Json.Linq;
 
 namespace EternalSolutions.Samples.B2C.Client.NotesServiceClient.Controllers
 {
     public class NotesController : Controller
     {
         // GET: Notes
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
-            return View();
-        }
+            var client = new HttpClient();
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, "https://localhost:44397/api/notes/");
+            var response = await client.SendAsync(request);
 
-        // GET: Notes/Details/5
-        public ActionResult Details(int id)
-        {
-            return View();
-        }
-
-        // GET: Notes/Create
-        public ActionResult Create()
-        {
-            return View();
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                ViewData["Notes"] = JsonConvert.DeserializeObject<List<Note>>(content);
+                return View();
+            }
+            else
+                return
+                    new RedirectResult("/Error?message=" + $"Status:{response.StatusCode}, Message:{response.ReasonPhrase}");
         }
 
         // POST: Notes/Create
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task<ActionResult> Create(string text)
         {
-            try
-            {
-                // TODO: Add insert logic here
-
-                return RedirectToAction("Index");
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: Notes/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
-
-        // POST: Notes/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
-            {
-                // TODO: Add update logic here
-
-                return RedirectToAction("Index");
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: Notes/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
+            var client = new HttpClient();
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:44397/api/notes/");
+            request.Content = new StringContent("{ Text: \"" + text + "\"}", Encoding.UTF8, "application/json");
+            var response = await client.SendAsync(request);
+            return RedirectToAction("Index");
         }
 
         // POST: Notes/Delete/5
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public async Task<ActionResult> Delete(int id)
         {
-            try
-            {
-                // TODO: Add delete logic here
-
-                return RedirectToAction("Index");
-            }
-            catch
-            {
-                return View();
-            }
+            var client = new HttpClient();
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Delete, "https://localhost:44397/api/notes/" + id);
+            var response = await client.SendAsync(request);
+            return RedirectToAction("Index");
         }
     }
 }

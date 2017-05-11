@@ -1,0 +1,41 @@
+@using EternalSolutions.Samples.B2C.Common.Contracts
+
+@{
+    ViewData["Title"] = "Notes";
+}
+
+
+<table class="table table-bordered table-striped table-hover table-condensed" style="table-layout: auto">
+
+    <tr>
+        <th>Notes:</th>
+        <th>More info</th>
+    </tr>
+
+    @foreach (var item in (ViewData["Notes"] as IList<Note>))
+    {
+        <tr>
+            <td>
+                @using (Html.BeginForm("Delete", "Notes", FormMethod.Post))
+                {
+                    @item.Text
+                    <button name="id" value="@item.Id" style="float:right">Delete</button>
+                }
+            </td>
+            <td>
+                Created By: @item.CreatedBy at @item.CreatedAt
+            </td>
+        </tr>
+    }
+
+</table>
+
+<br/>
+
+@using (Html.BeginForm("Create", "Notes", FormMethod.Post))
+{
+    <div>
+        New note: <input type="text" name="Text">
+        <input type="submit" value="Add note">
+    </div>
+}
