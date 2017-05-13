@@ -1,6 +1,9 @@
 ﻿using EternalSolutions.Samples.B2C.Api.NotesService.Notes;
+using EternalSolutions.Samples.B2C.Common;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -36,8 +39,37 @@ namespace EternalSolutions.Samples.B2C.Api.NotesService
             services.AddDbContext<NotesContext>(options =>
                 options.UseInMemoryDatabase());
 
-            // Add framework services.
-            services.AddMvc();
+            //Configure authorization policies that use scopes and claims.
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("ReadNotes", policy =>
+                    policy.RequireScope(Constants.Scopes.NotesServiceReadNotesScope));
+
+                options.AddPolicy("WriteNotes", policy =>
+                    policy.RequireScopesAll(new[]
+                    {
+                        Constants.Scopes.NotesServiceReadNotesScope,
+                        Constants.Scopes.NotesServiceWriteNotesScope
+                    }));
+
+                options.AddPolicy("DeleteNotes", policy =>
+                    policy.RequireScopesAll(new[]
+                    {
+                        Constants.Scopes.NotesServiceReadNotesScope,
+                        Constants.Scopes.NotesServiceWriteNotesScope
+                    })
+                    .RequireClaim("Name")
+                    .RequireClaim(Constants.IdentityProviderClaim, "twitter.com"));
+            });
+
+            // Removes the need for empty [Authorize] attribute
+            services.AddMvc(options =>
+            {
+                var requireAuthenticatedUserPolicy = new AuthorizationPolicyBuilder()
+                        .RequireAuthenticatedUser() 
+                        .Build();
+                options.Filters.Add(new AuthorizeFilter(requireAuthenticatedUserPolicy));
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -48,8 +80,9 @@ namespace EternalSolutions.Samples.B2C.Api.NotesService
 
             app.UseJwtBearerAuthentication(new JwtBearerOptions
             {
-                Authority = Configuration["Authentication:AzureAd:AADInstance"] + Configuration["Authentication:AzureAd:TenantId"],
-                Audience = Configuration["Authentication:AzureAd:Audience"]
+                Authority = string.Format("https://login.microsoftonline.com/tfp/{0}/{1}", Configuration["Authentication:AzureAdB2C:TenantName"], Configuration["Authentication:AzureAdB2C:SignInPolicyName"]),
+                Audience = Configuration["Authentication:AzureAdB2C:ClientId"],
+                MetadataAddress = string.Format(Configuration["Authentication:AzureAdB2C:MetadataEndpointUrlTemplate"], Configuration["Authentication:AzureAdB2C:TenantName"], Configuration["Authentication:AzureAdB2C:SignInPolicyName"])
             });
 
             app.UseMvc();

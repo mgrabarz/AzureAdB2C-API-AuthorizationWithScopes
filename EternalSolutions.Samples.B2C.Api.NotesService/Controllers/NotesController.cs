@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using EternalSolutions.Samples.B2C.Api.NotesService.Notes;
+﻿using EternalSolutions.Samples.B2C.Api.NotesService.Notes;
 using EternalSolutions.Samples.B2C.Common.Contracts;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace EternalSolutions.Samples.B2C.Api.NotesService.Controllers
 {
@@ -20,6 +19,7 @@ namespace EternalSolutions.Samples.B2C.Api.NotesService.Controllers
 
         // GET: api/values
         [HttpGet]
+        [Authorize(Policy = "ReadNotes")]
         public async Task<IActionResult> All()
         {
             var notes = await _dbContext.Notes.ToListAsync();
@@ -28,6 +28,7 @@ namespace EternalSolutions.Samples.B2C.Api.NotesService.Controllers
 
         // GET api/values/5
         [HttpGet("{id}")]
+        [Authorize(Policy = "ReadNotes")]
         public async Task<IActionResult> Get(int id)
         {
             var note = await _dbContext.Notes.FindAsync(id);
@@ -39,6 +40,7 @@ namespace EternalSolutions.Samples.B2C.Api.NotesService.Controllers
 
         // POST api/values
         [HttpPost]
+        [Authorize(Policy = "WriteNotes")]
         public async Task<IActionResult> Post([FromBody]Note note)
         {
             await _dbContext.Notes.AddAsync(note);
@@ -48,7 +50,7 @@ namespace EternalSolutions.Samples.B2C.Api.NotesService.Controllers
         }
 
         // DELETE api/values/5
-        [HttpDelete("{id}")]
+        [Authorize(Policy = "DeleteNotes")]
         public async Task<IActionResult> Delete(int id)
         {
             var note = await _dbContext.Notes.FindAsync(id);
