@@ -50,7 +50,7 @@ namespace EternalSolutions.Samples.B2C.Api.NotesService.Notes
             foreach (var note in notes)
             {
                 note.Property(nameof(Note.CreatedAt)).CurrentValue = DateTime.UtcNow;
-                note.Property(nameof(Note.CreatedBy)).CurrentValue = ClaimsPrincipal.Current?.Identity?.Name;
+                note.Property(nameof(Note.CreatedBy)).CurrentValue = ClaimsPrincipal.Current?.Claims.FirstOrDefault(claim => claim.Type == "Name")?.Value;
             }
         }
     }

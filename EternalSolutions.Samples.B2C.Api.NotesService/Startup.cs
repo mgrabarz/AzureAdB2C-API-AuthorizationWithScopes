@@ -50,7 +50,8 @@ namespace EternalSolutions.Samples.B2C.Api.NotesService
                     {
                         Constants.Scopes.NotesServiceReadNotesScope,
                         Constants.Scopes.NotesServiceWriteNotesScope
-                    }));
+                    })
+                    .RequireClaim("Name"));//We need this claim to record name of person who created note.
 
                 options.AddPolicy("DeleteNotes", policy =>
                     policy.RequireScopesAll(new[]
@@ -58,7 +59,6 @@ namespace EternalSolutions.Samples.B2C.Api.NotesService
                         Constants.Scopes.NotesServiceReadNotesScope,
                         Constants.Scopes.NotesServiceWriteNotesScope
                     })
-                    .RequireClaim("Name")
                     .RequireClaim(Constants.IdentityProviderClaim, "twitter.com"));
             });
 
