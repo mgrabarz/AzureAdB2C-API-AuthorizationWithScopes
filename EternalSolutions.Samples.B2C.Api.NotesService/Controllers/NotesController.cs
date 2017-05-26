@@ -44,12 +44,13 @@ namespace EternalSolutions.Samples.B2C.Api.NotesService.Controllers
         public async Task<IActionResult> Post([FromBody]Note note)
         {
             await _dbContext.Notes.AddAsync(note);
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync(HttpContext.User);
 
             return Ok(note.Id);
         }
 
         // DELETE api/values/5
+        [HttpDelete("{id}")]
         [Authorize(Policy = "DeleteNotes")]
         public async Task<IActionResult> Delete(int id)
         {
@@ -58,7 +59,7 @@ namespace EternalSolutions.Samples.B2C.Api.NotesService.Controllers
                 return NotFound();
 
             _dbContext.Notes.Remove(note);
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync(HttpContext.User);
             return Ok();
         }
     }

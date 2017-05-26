@@ -26,21 +26,14 @@ namespace EternalSolutions.Samples.B2C.Api.NotesService.Notes
                 .HasKey(note => note.Id);
         }
 
-        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
+        public async Task<int> SaveChangesAsync(ClaimsPrincipal principal)
         {
-            SaveChangesInternal();
+            SaveChangesInternal(principal);
 
-            return base.SaveChangesAsync(cancellationToken);
+            return await base.SaveChangesAsync();
         }
 
-        public override int SaveChanges()
-        {
-            SaveChangesInternal();
-
-            return base.SaveChanges();
-        }
-
-        private void SaveChangesInternal()
+        private void SaveChangesInternal(ClaimsPrincipal principal)
         {
             this.ChangeTracker.DetectChanges();
 
@@ -50,7 +43,7 @@ namespace EternalSolutions.Samples.B2C.Api.NotesService.Notes
             foreach (var note in notes)
             {
                 note.Property(nameof(Note.CreatedAt)).CurrentValue = DateTime.UtcNow;
-                note.Property(nameof(Note.CreatedBy)).CurrentValue = ClaimsPrincipal.Current?.Claims.FirstOrDefault(claim => claim.Type == "Name")?.Value;
+                note.Property(nameof(Note.CreatedBy)).CurrentValue = principal?.Claims.FirstOrDefault(claim => claim.Type == "name")?.Value;
             }
         }
     }
