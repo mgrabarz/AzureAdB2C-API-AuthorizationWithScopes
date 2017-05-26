@@ -11,12 +11,14 @@ using EternalSolutions.Samples.B2C.Common;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using EternalSolutions.Samples.B2C.Common.Contracts;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Protocols;
 
 namespace EternalSolutions.Samples.B2C.Client.NotesServiceClient.Controllers
 {
+    [Authorize]
     public class NotesController : Controller
     {
         public async Task<ActionResult> Index()
