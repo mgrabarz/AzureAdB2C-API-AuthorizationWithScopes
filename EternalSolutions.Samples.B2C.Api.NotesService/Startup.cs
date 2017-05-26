@@ -48,7 +48,6 @@ namespace EternalSolutions.Samples.B2C.Api.NotesService
                 options.AddPolicy("WriteNotes", policy =>
                     policy.RequireScopesAll(new[]
                     {
-                        Constants.Scopes.NotesServiceReadNotesScope,
                         Constants.Scopes.NotesServiceWriteNotesScope
                     })
                     .RequireClaim("Name"));//We need this claim to record name of person who created note.

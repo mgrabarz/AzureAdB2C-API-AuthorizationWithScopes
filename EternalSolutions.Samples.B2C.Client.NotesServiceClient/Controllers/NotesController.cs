@@ -55,7 +55,7 @@ namespace EternalSolutions.Samples.B2C.Client.NotesServiceClient.Controllers
         [HttpPost]
         public async Task<ActionResult> Delete(int id)
         {
-            var token = await AcquireToken(new[] { $"{Constants.Scopes.NotesServiceAppIdUri}{Constants.Scopes.NotesServiceWriteNotesScope}" });
+            var token = await AcquireToken(new[] { $"{Constants.Scopes.NotesServiceAppIdUri}{Constants.Scopes.NotesServiceReadNotesScope}{Constants.Scopes.NotesServiceWriteNotesScope}" });
 
             var client = new HttpClient();
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Delete, "https://localhost:44397/api/notes/" + id);
