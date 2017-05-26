@@ -39,20 +39,6 @@ namespace EternalSolutions.Samples.B2C.Client.NotesServiceClient
             return cache;
         }
 
-        public void SaveUserStateValue(string state)
-        {
-            SessionLock.EnterWriteLock();
-            httpContext.Session.Set(CacheId + "_state", Convert.FromBase64String(state));
-            SessionLock.ExitWriteLock();
-        }
-        public string ReadUserStateValue()
-        {
-            byte[] bytes = null;
-            SessionLock.EnterReadLock();
-            bool success = httpContext.Session.TryGetValue(CacheId + "_state", out bytes);
-            SessionLock.ExitReadLock();
-            return success ? Convert.ToBase64String(bytes) : string.Empty;
-        }
         public void Load()
         {
             SessionLock.EnterReadLock();
